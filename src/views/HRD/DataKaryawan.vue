@@ -7,11 +7,16 @@
         class="btn btn-primary"
         data-bs-toggle="modal"
         data-bs-target="#staticBackdrop"
+        @click="typeModal = 'add'"
       >
         + Karyawan
       </button>
     </div>
-    <Karyawan :data="userData" :spesifikasi="spesifikasiTable" />
+    <Karyawan
+      :data="userData"
+      :spesifikasi="spesifikasiTable"
+      @tipe-modal="tipeModal"
+    />
 
     <!-- Modal -->
     <div
@@ -29,18 +34,20 @@
             <h1 class="modal-title fs-5" id="staticBackdropLabel">
               Tambah data karyawan
             </h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <div class="alert alert-danger" role="alert" v-if="getErrMessage">
               {{ getErrMessage }}
             </div>
-            <Input @submit-data="postAddUser" />
+            <div v-if="typeModal !== ''">
+              <Input
+                :tipe="typeModal"
+                :user-data-by-id="userDataById"
+                @reset="typeModal = ''"
+                @submit-data="postAddUser"
+                @update-data="patchUpdateUser"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -53,14 +60,23 @@ import Input from "@/components/Input.vue";
 import { getCookie } from "@/plugins/cookies";
 import Karyawan from "@/components/Karyawan.vue";
 import router from "@/router";
-import { onMounted, computed, ref } from "vue";
+import { onMounted, computed, ref, watch } from "vue";
 import { useUsersStore } from "@/stores/users";
 
 const userStore = useUsersStore();
-
+const typeModal = ref("");
 const userData = computed(() => {
   return userStore.gtrGetAllUser;
 });
+
+const openModal = ref(false);
+
+const tipeModal = async (val) => {
+  await userStore.actGetUserById(val.idUser);
+  typeModal.value = val.tipe;
+};
+
+const userDataById = computed(() => userStore.getUserData);
 
 const spesifikasiTable = [
   "#",
@@ -73,7 +89,14 @@ const spesifikasiTable = [
 
 const postAddUser = async (data) => {
   const res = await userStore.postAddUser(data);
-  if (res === true) {
+  if (res) {
+    router.go(0);
+  }
+};
+
+const patchUpdateUser = async (data) => {
+  const res = await userStore.patchUpdateUser(data, "");
+  if (res) {
     router.go(0);
   }
 };

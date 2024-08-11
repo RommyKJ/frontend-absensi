@@ -14,14 +14,14 @@ export const useAbsenStore = defineStore("absen", {
     async postAbsenUser(params) {
       try {
         const res = await axios.post(API, params);
-        if (res.data.message === '"POST absensi masuk karyawan berhasil"') {
-          this.isSuccess = true;
+        if (res.data.message === "POST absensi masuk karyawan berhasil") {
+          return true;
         } else {
-          this.isSuccess = false;
+          return false;
         }
       } catch (error) {
-        this.isSuccess = false;
         this.errorMessages = "Absensi gagal";
+        return false;
       }
     },
     async actGetAllAbsen() {
@@ -37,6 +37,9 @@ export const useAbsenStore = defineStore("absen", {
   getters: {
     gtrGetAllAbsen: (state) => {
       return state.allAbsen;
+    },
+    gtrErrMessage: (state) => {
+      return state.errorMessages;
     },
   },
 });

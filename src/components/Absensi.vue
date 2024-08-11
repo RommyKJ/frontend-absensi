@@ -33,11 +33,20 @@
       </thead>
       <tbody>
         <tr v-for="(item, index) in paginatedData" :key="index">
-          <td>{{ index + 1 }}</td>
+          <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
           <td>{{ item.nama }}</td>
           <td>{{ formatDate(item.absen_masuk) }}</td>
           <td>{{ item.is_wfh }}</td>
-          <td>{{ item.img_wfh }}</td>
+          <td class="text-center">
+            <img
+              :src="fetchImgURL(item.img_wfh)"
+              width="50px"
+              height="50px"
+              @click="openGambar(fetchImgURL(item.img_wfh))"
+              data-bs-toggle="modal"
+              data-bs-target="#modalGambar"
+            />
+          </td>
         </tr>
       </tbody>
     </table>
@@ -70,6 +79,33 @@
         >
       </li>
     </ul>
+
+    <div
+      class="modal fade"
+      id="modalGambar"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+      tabindex="-1"
+      aria-labelledby="modalGambarLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-body">
+            <img :src="imgURLPath" width="100%" height="100%" />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -92,7 +128,18 @@ const searchQuery = ref("");
 const selectedFilter = ref("");
 const filterOptions = ref(["WFH"]); // Sesuaikan filter options
 const currentPage = ref(1);
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(5);
+const imgURLPath = ref("");
+
+const fetchImgURL = (imgPath) => {
+  let imgName = imgPath.split("/").pop();
+  return `http://localhost:4000/img/${imgName}`;
+};
+
+const openGambar = (imgURL) => {
+  console.log(imgURL);
+  imgURLPath.value = imgURL;
+};
 
 const filteredData = computed(() => {
   let filtered = props.data;

@@ -33,12 +33,21 @@
       </thead>
       <tbody>
         <tr v-for="(item, index) in paginatedData" :key="index">
-          <td>{{ index + 1 }}</td>
+          <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
           <td>{{ item.nama }}</td>
           <td>{{ item.email }}</td>
           <td>{{ item.no_telepon }}</td>
           <td>{{ item.role }}</td>
-          <td>Edit</td>
+          <td>
+            <button
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#staticBackdrop"
+              @click="$emit('tipeModal', { tipe: 'edit', idUser: item.id })"
+            >
+              <BIconPencilSquare /> Edit
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -92,7 +101,7 @@ const searchQuery = ref("");
 const selectedFilter = ref("");
 const filterOptions = ref(["HRD", "Karyawan"]); // Sesuaikan filter options
 const currentPage = ref(1);
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(5);
 
 const filteredData = computed(() => {
   let filtered = props.data;

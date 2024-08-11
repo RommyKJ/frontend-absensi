@@ -18,9 +18,8 @@ export const useUsersStore = defineStore("users", {
         console.log(res);
         if (res.data.message === "Login Berhasil") {
           const [data] = res.data.data;
-          this.user = data;
           this.isSuccess = true;
-          setCookie("data", JSON.stringify(this.user));
+          setCookie("data", JSON.stringify(data));
           setCookie("token", JSON.stringify(res.data.token));
           if (data.role === "karyawan") {
             router.push("/absensi");
@@ -53,6 +52,44 @@ export const useUsersStore = defineStore("users", {
         }
         return false;
       }
+    },
+    async actGetUserById(idUser) {
+      try {
+        const res = await axios.get(API + `/id=${idUser}`);
+        const [data] = res.data.data;
+        this.user = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async patchUpdateUser(params, type) {
+      try {
+        const res = await axios.patch(
+          API + `/update/id=${params.id}`,
+          params.data
+        );
+        if (type === "profile") {
+          setCookie("data", JSON.stringify(res.data.data));
+        }
+        return true;
+      } catch (error) {
+        console.log(error);
+        if (
+          error?.response?.data?.serverMessage?.message?.includes(
+            "Duplicate entry"
+          )
+        ) {
+          this.errMessage = "Email telah digunakan!";
+        }
+        return false;
+      }
+    },
+
+    logout() {
+      document.cookie =
+        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "data=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      router.push("/");
     },
   },
 

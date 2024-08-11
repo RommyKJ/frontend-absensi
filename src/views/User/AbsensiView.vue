@@ -3,7 +3,10 @@
     <div class="container">
       <div class="container-absen">
         <div class="w-100 d-flex flex-cols justify-content-between">
-          <div style="width: 100px; height: 100px">
+          <div
+            style="width: 100px; height: 100px"
+            @click="router.push('/absensi')"
+          >
             <svg
               preserveAspectRatio="xMidYMid meet"
               data-bbox="63.46 221.97 953.09 636.06"
@@ -37,13 +40,27 @@
               </g>
             </svg>
           </div>
-          <div>
+          <div @click="router.push('/profile')">
             <span class="text-primary" style="cursor: pointer"
               ><b>Profile</b> <BIconArrowRight
             /></span>
           </div>
         </div>
         <div class="container-absen-form">
+          <div
+            class="alert alert-success"
+            role="alert"
+            v-if="isSuccess == true"
+          >
+            Absen Berhasil!
+          </div>
+          <div
+            class="alert alert-danger"
+            role="alert"
+            v-if="isSuccess == false"
+          >
+            Absen Gagal!
+          </div>
           <h1>Halo {{ dataUser?.nama }}!</h1>
           <p>
             Time Now: <b>{{ date.toLocaleTimeString() }}</b>
@@ -77,7 +94,7 @@
               />
               <img
                 v-if="img"
-                style="width 80px; height: 80px; margin-left: 40px; border: 1px solid; border-radius: 10px;"
+                style="width 80px; height: 80px; margin-left: 20px; border: 1px solid; border-radius: 10px;"
                 :src="imgPreview"
               />
             </div>
@@ -108,6 +125,7 @@ const isWFH = ref("no");
 const imgWFH = ref(null);
 const imgPreview = ref("");
 const img = ref(null);
+const isSuccess = ref(null);
 
 const dataUser = computed(() => {
   if (getCookie("data")) {
@@ -130,7 +148,7 @@ const handleFileChange = (event) => {
   reader.readAsArrayBuffer(img.value);
 };
 
-const absensiUser = () => {
+const absensiUser = async () => {
   const formData = new FormData();
   formData.append("idUser", dataUser.value.id);
   formData.append("is_wfh", isWFH.value);
@@ -138,7 +156,13 @@ const absensiUser = () => {
     formData.append("img_wfh", imgWFH.value);
   }
 
-  storeAbsen.postAbsenUser(formData);
+  const res = await storeAbsen.postAbsenUser(formData);
+  if (res) {
+    isSuccess.value = true;
+    (isWFH.value = "no"), (imgWFH.value = null), (imgPreview.value = "");
+  } else {
+    isSuccess.value = false;
+  }
 };
 
 const date = ref(new Date());

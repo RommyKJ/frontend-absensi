@@ -12,7 +12,7 @@
       >
         <RouterLink to="/" style="text-decoration: none">
           <button
-            class="nav-link active"
+            class="nav-link"
             id="v-pills-home-tab"
             data-bs-toggle="pill"
             data-bs-target="#v-pills-home"
@@ -20,13 +20,11 @@
             role="tab"
             aria-controls="v-pills-home"
             aria-selected="true"
-          >
-            Home
-          </button>
+          ></button>
         </RouterLink>
         <RouterLink to="/datakaryawan" style="text-decoration: none">
           <button
-            class="nav-link"
+            class="nav-link active"
             id="v-pills-profile-tab"
             data-bs-toggle="pill"
             data-bs-target="#v-pills-profile"
@@ -52,6 +50,7 @@
             Absensi
           </button>
         </RouterLink>
+        <button class="nav-link" @click="logout">Logout</button>
       </div>
       <div
         class="tab-content w-100 h-100 align-item-center p-4"
@@ -67,12 +66,19 @@
 import { getCookie } from "@/plugins/cookies";
 import router from "@/router";
 import { onMounted, computed } from "vue";
+import { useUsersStore } from "@/stores/users";
 
+const userStore = useUsersStore();
+
+const logout = () => {
+  userStore.logout();
+};
 onMounted(async () => {
   const res = JSON.parse(getCookie("data"));
   if (res.role === "karyawan") {
     router.push("/absensi");
   }
+  router.push("/datakaryawan");
 });
 </script>
 
