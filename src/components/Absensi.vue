@@ -7,22 +7,33 @@
       placeholder="Search"
       @input="searchData"
     />
-    <div class="form-group mt-2">
-      <label for="filter">Filter by:</label>
-      <select
-        v-model="selectedFilter"
-        @change="filterData"
-        class="form-control"
-      >
-        <option value="">All</option>
-        <option
-          v-for="(value, index) in filterOptions"
-          :key="index"
-          :value="value"
+    <div class="form-group mt-2 d-flex justify-content-between w-100">
+      <div style="width: 45%">
+        <label for="filter">Filter by:</label>
+        <select
+          v-model="selectedFilter"
+          @change="filterData"
+          class="form-control"
         >
-          {{ value }}
-        </option>
-      </select>
+          <option value="">All</option>
+          <option
+            v-for="(value, index) in filterOptions"
+            :key="index"
+            :value="value"
+          >
+            {{ value }}
+          </option>
+        </select>
+      </div>
+      <div style="width: 45%">
+        <label for="filter">Filter Tanggal:</label>
+        <input
+          type="date"
+          class="form-control"
+          id="dateInput"
+          v-model="selectedDate"
+        />
+      </div>
     </div>
 
     <table class="table table-responsive table-bordered mt-3">
@@ -36,9 +47,13 @@
           <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
           <td>{{ item.nama }}</td>
           <td>{{ formatDate(item.absen_masuk) }}</td>
+          <td>
+            {{ item.absen_keluar === "" ? "" : formatDate(item.absen_keluar) }}
+          </td>
           <td>{{ item.is_wfh }}</td>
           <td class="text-center">
             <img
+              v-if="item.is_wfh === 'yes'"
               :src="fetchImgURL(item.img_wfh)"
               width="50px"
               height="50px"
@@ -47,6 +62,7 @@
               data-bs-target="#modalGambar"
             />
           </td>
+          <td>{{ item.keterangan }}</td>
         </tr>
       </tbody>
     </table>
@@ -123,13 +139,14 @@ const props = defineProps({
     default: [],
   },
 });
-const { formatDate } = useFilter();
+const { formatDate, isLate } = useFilter();
 const searchQuery = ref("");
 const selectedFilter = ref("");
-const filterOptions = ref(["WFH"]); // Sesuaikan filter options
+const filterOptions = ref(["WFH", "Telat"]); // Sesuaikan filter options
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 const imgURLPath = ref("");
+const selectedDate = ref("");
 
 const fetchImgURL = (imgPath) => {
   let imgName = imgPath.split("/").pop();
@@ -152,8 +169,19 @@ const filteredData = computed(() => {
     );
   }
 
-  if (selectedFilter.value) {
+  if (selectedFilter.value === "WFH") {
     filtered = filtered.filter((item) => item.is_wfh === "yes");
+  } else if (selectedFilter === "Telat") {
+    filtered = filtered.filter((item) => item.keterangan === "telat");
+  }
+
+  if (selectedDate.value) {
+    filtered = filtered.filter((item) => {
+      const itemDateString = new Date(item.absen_masuk)
+        .toISOString()
+        .split("T")[0];
+      return itemDateString === selectedDate.value;
+    });
   }
 
   return filtered;

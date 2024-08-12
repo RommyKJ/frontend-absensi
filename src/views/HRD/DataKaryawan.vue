@@ -32,7 +32,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="staticBackdropLabel">
-              Tambah data karyawan
+              Data karyawan
             </h1>
           </div>
           <div class="modal-body">

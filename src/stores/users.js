@@ -28,8 +28,9 @@ export const useUsersStore = defineStore("users", {
           }
         }
       } catch (error) {
+        console.log(error);
         this.isSuccess = false;
-        this.errMessage = error.response.data.message;
+        this.errMessage = error?.response?.data?.message;
       }
     },
     async actGetAllUser() {
@@ -46,7 +47,9 @@ export const useUsersStore = defineStore("users", {
         return true;
       } catch (error) {
         if (
-          error.response.data.serverMessage.message.includes("Duplicate entry")
+          error?.response?.data?.serverMessage?.message?.includes(
+            "Duplicate entry"
+          )
         ) {
           this.errMessage = "Email telah digunakan!";
         }
@@ -58,8 +61,9 @@ export const useUsersStore = defineStore("users", {
         const res = await axios.get(API + `/id=${idUser}`);
         const [data] = res.data.data;
         this.user = data;
+        this.errMessage = "";
       } catch (error) {
-        console.log(error);
+        this.errMessage = error?.response?.data?.message;
       }
     },
     async patchUpdateUser(params, type) {
@@ -80,6 +84,8 @@ export const useUsersStore = defineStore("users", {
           )
         ) {
           this.errMessage = "Email telah digunakan!";
+        } else {
+          this.errMessage = "Update gagal!";
         }
         return false;
       }

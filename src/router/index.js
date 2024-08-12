@@ -4,7 +4,8 @@ import AbsensiView from "../views/User/AbsensiView.vue";
 import DashboardView from "@/views/HRD/DashboardView.vue";
 import DataKaryawan from "@/views/HRD/DataKaryawan.vue";
 import DataAbsensi from "@/views/HRD/DataAbsensi.vue";
-import ProfileView from "@/views/USer/Profile.vue";
+import ProfileView from "@/views/User/Profile.vue";
+import OverallData from "@/views/HRD/OverallData.vue";
 import { getCookie } from "@/plugins/cookies";
 
 const router = createRouter({
@@ -39,6 +40,11 @@ const router = createRouter({
           path: "/dataabsensi",
           name: "DataAbsensi",
           component: DataAbsensi,
+        },
+        {
+          path: "/overall",
+          name: "Overall",
+          component: OverallData,
         },
       ],
     },

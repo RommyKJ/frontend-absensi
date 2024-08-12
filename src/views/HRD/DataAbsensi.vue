@@ -20,9 +20,11 @@ const dataAbsensi = computed(() => {
 const spesifikasiTable = [
   "#",
   "Nama Karyawan",
-  "Jam Absen",
+  "Absen Masuk",
+  "Absen Keluar",
   "WFH",
   "Bukti WFH",
+  "Keterangan",
 ];
 onMounted(async () => {
   const res = JSON.parse(getCookie("data"));

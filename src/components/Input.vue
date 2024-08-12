@@ -8,6 +8,7 @@
         type="text"
         placeholder="Masukkan nama.."
         v-model="nama"
+        :disabled="tipe === 'edit-profile'"
       />
       <span class="text-danger" style="font-size: 10px" v-if="errNama">{{
         errNama
@@ -21,20 +22,8 @@
         type="email"
         placeholder="Masukkan email.."
         v-model="email"
+        :disabled="tipe === 'edit-profile'"
       />
-    </div>
-    <div class="mb-3" v-if="tipe === 'add' || tipe === 'edit-profile'">
-      <label for="password" class="mb-1">Password</label>
-      <input
-        id="password"
-        class="form-control"
-        type="password"
-        placeholder="Masukkan password.."
-        v-model="password"
-      />
-      <span class="text-danger" style="font-size: 10px" v-if="errPassword">{{
-        errPassword
-      }}</span>
     </div>
     <div class="mb-3">
       <label for="no" class="mb-1">No. Telepon</label>
@@ -49,16 +38,42 @@
         errPhone
       }}</span>
     </div>
-    <div class="mb-3" v-if="tipe === 'edit' || tipe === 'edit-profile'">
+    <div class="mb-3">
       <label for="no" class="mb-1">Role</label>
-      <input
-        id="no"
-        class="form-control"
-        type="tel"
-        placeholder="Masukkan nomor telepon.."
+      <select
+        class="form-select"
+        :disabled="tipe === 'edit-profile'"
         v-model="role"
-        readonly
+      >
+        <option value="karyawan">Karyawan</option>
+        <option value="hrd">HRD</option>
+      </select>
+    </div>
+    <div class="mb-3" v-if="tipe === 'add'">
+      <label for="password" class="mb-1">Password</label>
+      <input
+        id="password"
+        class="form-control"
+        type="password"
+        placeholder="Masukkan password.."
+        v-model="password"
       />
+      <span class="text-danger" style="font-size: 10px" v-if="errPassword">{{
+        errPassword
+      }}</span>
+    </div>
+    <div class="mb-3" v-if="tipe === 'edit' || tipe === 'edit-profile'">
+      <label for="password" class="mb-1">Update Password</label>
+      <input
+        id="password"
+        class="form-control"
+        type="password"
+        placeholder="Masukkan password.."
+        v-model="updatePassword"
+      />
+      <span class="text-danger" style="font-size: 10px" v-if="errPassword">{{
+        errPassword
+      }}</span>
     </div>
   </div>
   <div class="d-flex justify-content-end w-100">
@@ -103,10 +118,11 @@ const nama = ref("");
 const email = ref("");
 const phone = ref("");
 const password = ref("");
-const role = ref("");
+const role = ref("karyawan");
 const errNama = ref("");
 const errPassword = ref("");
 const errPhone = ref("");
+const updatePassword = ref("");
 
 const reset = () => {
   nama.value = "";
@@ -125,7 +141,7 @@ watch(nama, (val) => {
   }
 });
 
-watch(password, (val) => {
+watch(updatePassword, (val) => {
   if (val.length < 8) {
     errPassword.value = "Password minimal 8 karakter";
   } else {
@@ -147,7 +163,6 @@ if (props.tipe === "edit" || props.tipe === "edit-profile") {
   email.value = props.userDataById.email;
   phone.value = props.userDataById.no_telepon;
   role.value = props.userDataById.role;
-  password.value = props.userDataById.password;
 }
 
 const emit = defineEmits(["submitData", "reset", "updateData"]);
@@ -158,16 +173,16 @@ const emitSubmit = (val) => {
       email: email.value,
       password: password.value,
       no_telepon: phone.value,
-      role: "karyawan",
+      role: role.value,
     });
   } else {
     const data = {
       nama: nama.value,
       email: email.value,
-      password: password.value,
       no_telepon: phone.value,
       role: role.value,
-      password: password.value,
+      password:
+        updatePassword.value !== "" ? updatePassword.value : password.value,
     };
     emit("updateData", { id: props.userDataById.id, data: data });
   }

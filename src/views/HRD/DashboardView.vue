@@ -10,6 +10,19 @@
         role="tablist"
         aria-orientation="vertical"
       >
+        <button
+          class="nav-link"
+          id="v-pills-messages-tab"
+          data-bs-toggle="pill"
+          data-bs-target="#v-pills-messages"
+          type="button"
+          role="tab"
+          aria-controls="v-pills-messages"
+          aria-selected="false"
+          @click="router.push('/absensi')"
+        >
+          Absensi
+        </button>
         <RouterLink to="/" style="text-decoration: none">
           <button
             class="nav-link"
@@ -22,9 +35,26 @@
             aria-selected="true"
           ></button>
         </RouterLink>
-        <RouterLink to="/datakaryawan" style="text-decoration: none">
+        <RouterLink
+          to="/overall"
+          style="text-decoration: none; display: flex; justify-content: center"
+        >
           <button
             class="nav-link active"
+            id="v-pills-home-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#v-pills-home"
+            type="button"
+            role="tab"
+            aria-controls="v-pills-home"
+            aria-selected="true"
+          >
+            Home
+          </button>
+        </RouterLink>
+        <RouterLink to="/datakaryawan" style="text-decoration: none">
+          <button
+            class="nav-link"
             id="v-pills-profile-tab"
             data-bs-toggle="pill"
             data-bs-target="#v-pills-profile"
@@ -33,7 +63,7 @@
             aria-controls="v-pills-profile"
             aria-selected="false"
           >
-            Karyawan
+            Data Karyawan
           </button>
         </RouterLink>
         <RouterLink to="/dataabsensi" style="text-decoration: none">
@@ -47,7 +77,7 @@
             aria-controls="v-pills-messages"
             aria-selected="false"
           >
-            Absensi
+            Data Absensi
           </button>
         </RouterLink>
         <button class="nav-link" @click="logout">Logout</button>
@@ -78,7 +108,7 @@ onMounted(async () => {
   if (res.role === "karyawan") {
     router.push("/absensi");
   }
-  router.push("/datakaryawan");
+  router.push("/overall");
 });
 </script>
 

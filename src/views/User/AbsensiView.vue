@@ -2,6 +2,14 @@
   <div class="bg-container">
     <div class="container">
       <div class="container-absen">
+        <div
+          v-if="dataUser?.role === 'hrd'"
+          class="mb-3 text-primary"
+          @click="router.push('/dashboard')"
+          style="cursor: pointer"
+        >
+          Back to Dashboard
+        </div>
         <div class="w-100 d-flex flex-cols justify-content-between">
           <div
             style="width: 100px; height: 100px"
@@ -59,9 +67,10 @@
             role="alert"
             v-if="isSuccess == false"
           >
-            Absen Gagal!
+            Absen Gagal! {{ errMessage }}
           </div>
           <h1>Halo {{ dataUser?.nama }}!</h1>
+          <p>Jam kerja: <b>8 AM - 5 PM</b></p>
           <p>
             Time Now: <b>{{ date.toLocaleTimeString() }}</b>
           </p>
@@ -75,18 +84,19 @@
               id="wfh"
             />
           </div>
-          <div style="height: 100px">
+          <div style="height: 150px">
             <div
               v-if="isWFH === 'yes'"
               style="
                 display: flex;
-                flex-direction: row;
+                flex-direction: column;
                 width: 100%;
                 align-items: center;
                 justify-content: center;
               "
             >
               <input
+                style="flex-wrap: wrap"
                 type="file"
                 accept="image/jpeg, image/png"
                 capture="camera"
@@ -94,18 +104,28 @@
               />
               <img
                 v-if="img"
-                style="width 80px; height: 80px; margin-left: 20px; border: 1px solid; border-radius: 10px;"
+                style="width 80px; height: 80px; border: 1px solid; border-radius: 10px;"
                 :src="imgPreview"
               />
             </div>
           </div>
-          <button
-            @click="absensiUser()"
-            class="btn btn-primary"
-            style="width: 80%"
-          >
-            Absen
-          </button>
+          <div class="d-flex w-100 justify-content-between">
+            <button
+              @click="absensiUser('masuk')"
+              class="btn btn-primary"
+              style="width: 45%"
+              :disabled="isWFH === 'yes' && imgWFH === null"
+            >
+              Absen Masuk
+            </button>
+            <button
+              @click="absensiUser('keluar')"
+              class="btn btn-primary"
+              style="width: 45%"
+            >
+              Absen Keluar
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -126,6 +146,11 @@ const imgWFH = ref(null);
 const imgPreview = ref("");
 const img = ref(null);
 const isSuccess = ref(null);
+const errMessage = ref("");
+
+const absenMasuk = computed(() => {
+  return storeAbsen.gtrGetAbsenMasuk;
+});
 
 const dataUser = computed(() => {
   if (getCookie("data")) {
@@ -148,20 +173,34 @@ const handleFileChange = (event) => {
   reader.readAsArrayBuffer(img.value);
 };
 
-const absensiUser = async () => {
-  const formData = new FormData();
-  formData.append("idUser", dataUser.value.id);
-  formData.append("is_wfh", isWFH.value);
-  if (imgWFH.value) {
-    formData.append("img_wfh", imgWFH.value);
-  }
+const absensiUser = async (tipeAbsen) => {
+  if (tipeAbsen === "masuk") {
+    const formData = new FormData();
+    formData.append("idUser", dataUser.value.id);
+    formData.append("is_wfh", isWFH.value);
+    if (imgWFH.value) {
+      formData.append("img_wfh", imgWFH.value);
+    }
 
-  const res = await storeAbsen.postAbsenUser(formData);
-  if (res) {
-    isSuccess.value = true;
-    (isWFH.value = "no"), (imgWFH.value = null), (imgPreview.value = "");
+    const res = await storeAbsen.postAbsenUser(formData);
+    if (res) {
+      isSuccess.value = true;
+      (isWFH.value = "no"), (imgWFH.value = null), (imgPreview.value = "");
+    } else {
+      isSuccess.value = false;
+    }
   } else {
-    isSuccess.value = false;
+    await storeAbsen.actGetAbsenMasuk(dataUser.value.id);
+    console.log(absenMasuk.value.length);
+    if (absenMasuk?.value?.length > 0) {
+      const res = await storeAbsen.actPatchAbsenKeluar({
+        idUser: dataUser.value.id,
+      });
+      isSuccess.value = true;
+    } else {
+      isSuccess.value = false;
+      errMessage.value = "Anda belum absen masuk!";
+    }
   }
 };
 

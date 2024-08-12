@@ -34,7 +34,21 @@ export default function useFilter() {
     return `${dayName}, ${day} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
   };
 
+  const isLate = (waktuAbsen) => {
+    const absen = new Date(waktuAbsen);
+
+    const tanggal = absen.toDateString(); // ex. 'Mon Aug 12 2024'
+    const batasWaktu = new Date(`${tanggal} 08:00:00 GMT+0700`);
+
+    if (absen < batasWaktu) {
+      return "Tidak Telat";
+    } else {
+      return "Telat";
+    }
+  };
+
   return {
     formatDate,
+    isLate,
   };
 }
