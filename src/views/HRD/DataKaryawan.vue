@@ -12,6 +12,19 @@
         + Karyawan
       </button>
     </div>
+    <div
+      v-if="isSuccess === true"
+      class="alert alert-success alert-dismissible fade show"
+      role="alert"
+    >
+      <strong>{{ message }}</strong>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+    </div>
     <Karyawan
       :data="userData"
       :spesifikasi="spesifikasiTable"
@@ -19,11 +32,11 @@
     />
 
     <!-- Modal -->
+
     <div
+      ref="modal"
       class="modal fade"
       id="staticBackdrop"
-      data-bs-backdrop="static"
-      data-bs-keyboard="false"
       tabindex="-1"
       aria-labelledby="staticBackdropLabel"
       aria-hidden="true"
@@ -56,6 +69,7 @@
 </template>
 
 <script setup>
+import { Modal } from "bootstrap";
 import Input from "@/components/Input.vue";
 import { getCookie } from "@/plugins/cookies";
 import Karyawan from "@/components/Karyawan.vue";
@@ -69,8 +83,11 @@ const userData = computed(() => {
   return userStore.gtrGetAllUser;
 });
 
-const openModal = ref(false);
+const isSuccess = ref(false);
 
+const message = computed(() => {
+  return userStore.getSuccessMessage;
+});
 const tipeModal = async (val) => {
   await userStore.actGetUserById(val.idUser);
   typeModal.value = val.tipe;
@@ -90,14 +107,14 @@ const spesifikasiTable = [
 const postAddUser = async (data) => {
   const res = await userStore.postAddUser(data);
   if (res) {
-    router.go(0);
+    isSuccess.value = true;
   }
 };
 
 const patchUpdateUser = async (data) => {
   const res = await userStore.patchUpdateUser(data, "");
   if (res) {
-    router.go(0);
+    isSuccess.value = true;
   }
 };
 

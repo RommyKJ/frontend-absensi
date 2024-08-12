@@ -1,14 +1,11 @@
-import "./assets/main.css";
-
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { BootstrapIconsPlugin } from "bootstrap-icons-vue";
 
 import App from "./App.vue";
 import router from "./router";
-// import { BootstrapVue } from "bootstrap-vue";
 
 const app = createApp(App);
 

@@ -9,6 +9,7 @@ export const useUsersStore = defineStore("users", {
     user: {},
     users: [],
     errMessage: "",
+    succMessage: "",
     isSuccess: false,
   }),
   actions: {
@@ -44,7 +45,11 @@ export const useUsersStore = defineStore("users", {
     async postAddUser(params) {
       try {
         const res = await axios.post(API + "/add", params);
-        return true;
+        if (res.data.message === "Data karyawan berhasil ditambahkan!") {
+          this.users.push(res.data.data);
+          this.succMessage = res.data.message;
+          return true;
+        }
       } catch (error) {
         if (
           error?.response?.data?.serverMessage?.message?.includes(
@@ -72,8 +77,17 @@ export const useUsersStore = defineStore("users", {
           API + `/update/id=${params.id}`,
           params.data
         );
-        if (type === "profile") {
-          setCookie("data", JSON.stringify(res.data.data));
+        if (res.data.message === "Data karyawan berhasil diupdate!") {
+          if (type === "profile") {
+            setCookie("data", JSON.stringify(res.data.data));
+          }
+          for (let i = 0; i < this.users.length; i++) {
+            if (this.users[i].id === params.id) {
+              this.users[i] = { id: params.id, ...params.data };
+            }
+          }
+          this.succMessage = res.data.message;
+          console.log(this.users);
         }
         return true;
       } catch (error) {
@@ -111,6 +125,9 @@ export const useUsersStore = defineStore("users", {
     },
     getErrMessage: (state) => {
       return state.errMessage;
+    },
+    getSuccessMessage: (state) => {
+      return state.succMessage;
     },
   },
 });
