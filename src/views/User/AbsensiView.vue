@@ -70,9 +70,10 @@
             Absen Gagal! {{ errMessage }}
           </div>
           <h1>Halo {{ dataUser?.nama }}!</h1>
-          <p>Jam kerja: <b>8 AM - 5 PM</b></p>
+          <p>Jam kerja: <b>08.00 - 17.00</b></p>
           <p>
-            Time Now: <b>{{ date.toLocaleTimeString() }}</b>
+            Time Now:
+            <b>{{ date.toLocaleTimeString("en-US", { hour12: false }) }}</b>
           </p>
 
           <p v-if="absenMasuk.length > 0">

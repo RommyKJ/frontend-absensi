@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="container-fluid w-100 p-4"
-    style="background-color: black; height: 100vh"
-  >
+  <div class="container-fluid w-100 p-4 bg-dashboard">
     <div class="d-flex align-items-start navbar-custom">
       <div
         class="nav flex-column nav-pills me-3 h-custom p-4"
@@ -116,12 +113,17 @@ onMounted(async () => {
 .navbar-custom {
   border-radius: 10px;
   height: 100%;
-  background-color: #c15959;
+  background-color: rgb(232, 42, 49);
 }
 .h-custom {
   height: 100%;
   border-radius: 10px 0px 0px 10px;
   background-color: #ffffff;
+}
+
+.bg-dashboard {
+  background-color: #036cdb;
+  height: 100vh;
 }
 
 .custom-tabs {

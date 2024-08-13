@@ -146,7 +146,7 @@ const props = defineProps({
 const { formatDate, isLate } = useFilter();
 const searchQuery = ref("");
 const selectedFilter = ref("");
-const filterOptions = ref(["WFH", "Telat"]); // Sesuaikan filter options
+const filterOptions = ref(["WFH", "Telat", "Tidak Telat"]); // Sesuaikan filter options
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 const imgURLPath = ref("");
@@ -175,8 +175,10 @@ const filteredData = computed(() => {
 
   if (selectedFilter.value === "WFH") {
     filtered = filtered.filter((item) => item.is_wfh === "yes");
-  } else if (selectedFilter === "Telat") {
-    filtered = filtered.filter((item) => item.keterangan === "telat");
+  } else if (selectedFilter.value === "Telat") {
+    filtered = filtered.filter((item) => item.keterangan === "Telat");
+  } else if (selectedFilter.value === "Tidak Telat") {
+    filtered = filtered.filter((item) => item.keterangan === "Tidak Telat");
   }
 
   if (selectedDate.value) {

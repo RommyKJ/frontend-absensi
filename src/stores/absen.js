@@ -43,7 +43,7 @@ export const useAbsenStore = defineStore("absen", {
       try {
         const res = await axios.get(API + "/all");
         this.allAbsen = res.data.data.map((absen) => {
-          const isAbsenLate = isLate(absen.waktuAbsen);
+          const isAbsenLate = isLate(absen.absen_masuk);
           return {
             ...absen,
             keterangan: isAbsenLate,

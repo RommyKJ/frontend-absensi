@@ -108,6 +108,8 @@ const postAddUser = async (data) => {
   const res = await userStore.postAddUser(data);
   if (res) {
     isSuccess.value = true;
+  } else {
+    isSuccess.value = false;
   }
 };
 
@@ -115,6 +117,8 @@ const patchUpdateUser = async (data) => {
   const res = await userStore.patchUpdateUser(data, "");
   if (res) {
     isSuccess.value = true;
+  } else {
+    isSuccess.value = false;
   }
 };
 

@@ -27,6 +27,7 @@ export const useUsersStore = defineStore("users", {
           } else {
             router.push("/dashboard");
           }
+          this.errMessage = "";
         }
       } catch (error) {
         console.log(error);
@@ -48,6 +49,7 @@ export const useUsersStore = defineStore("users", {
         if (res.data.message === "Data karyawan berhasil ditambahkan!") {
           this.users.push(res.data.data);
           this.succMessage = res.data.message;
+          this.errMessage = "";
           return true;
         }
       } catch (error) {
@@ -87,7 +89,7 @@ export const useUsersStore = defineStore("users", {
             }
           }
           this.succMessage = res.data.message;
-          console.log(this.users);
+          this.errMessage = "";
         }
         return true;
       } catch (error) {
