@@ -35,7 +35,7 @@
       <div style="width: 45%">
         <h2 class="text-white">Total Pegawai WFH</h2>
         <div class="info-container">
-          <p class="text-100 mb-0">{{ hrd.length }}</p>
+          <p class="text-100 mb-0">{{ empWFH.length }}</p>
           <p>Pegawai</p>
         </div>
       </div>

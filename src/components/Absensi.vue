@@ -48,7 +48,11 @@
           <td>{{ item.nama }}</td>
           <td>{{ formatDate(item.absen_masuk) }}</td>
           <td>
-            {{ item.absen_keluar === "" ? "" : formatDate(item.absen_keluar) }}
+            {{
+              item.absen_keluar === null
+                ? "Belum absen keluar"
+                : formatDate(item.absen_keluar)
+            }}
           </td>
           <td>{{ item.is_wfh }}</td>
           <td class="text-center">

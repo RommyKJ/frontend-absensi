@@ -1,8 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import useFilter from "../composable/filter";
-import router from "@/router";
-import { setCookie, getCookie } from "../plugins/cookies";
 
 const API = "http://localhost:4000/absen";
 const { isLate } = useFilter();
@@ -16,11 +14,25 @@ export const useAbsenStore = defineStore("absen", {
   actions: {
     async postAbsenUser(params) {
       try {
-        const res = await axios.post(API, params);
-        if (res.data.message === "POST absensi masuk karyawan berhasil") {
-          return true;
+        const idUser = params.get("idUser");
+        const checkAbsensi = await axios.get(API + `/masuk/${idUser}`);
+        this.absen = checkAbsensi.data.data;
+        if (checkAbsensi.data.data.length == 0) {
+          const res = await axios.post(API, params);
+          if (res.data.message === "POST absensi masuk karyawan berhasil") {
+            this.absen = [res.data.data];
+            return true;
+          } else {
+            return false;
+          }
         } else {
-          return false;
+          const tipe = params.get("tipe");
+          const updateAbsensi = await this.actPatchAbsen({
+            idUser: idUser,
+            idAbsen: this.absen[0].id,
+            tipe: tipe,
+          });
+          return updateAbsensi;
         }
       } catch (error) {
         this.errorMessages = "Absensi gagal";
@@ -46,7 +58,6 @@ export const useAbsenStore = defineStore("absen", {
         const res = await axios.get(API + `/masuk/${params}`);
         if (res.data.message === "Get absensi masuk karyawan berhasil") {
           this.absen = res.data.data;
-          console.log(res);
           return true;
         } else {
           return false;
@@ -56,10 +67,10 @@ export const useAbsenStore = defineStore("absen", {
         return false;
       }
     },
-    async actPatchAbsenKeluar(params) {
+    async actPatchAbsen(params) {
       try {
-        const res = await axios.patch(API + "/keluar", params);
-        if (res.data.message === "PATCH absensi keluar karyawan berhasil") {
+        const res = await axios.patch(API + "/update", params);
+        if (res.data.message === "Update absensi karyawan berhasil") {
           return true;
         } else {
           return false;

@@ -60,7 +60,7 @@
             role="alert"
             v-if="isSuccess == true"
           >
-            Absen Berhasil!
+            {{ message }}
           </div>
           <div
             class="alert alert-danger"
@@ -74,39 +74,57 @@
           <p>
             Time Now: <b>{{ date.toLocaleTimeString() }}</b>
           </p>
-          <div style="display: flex; margin-bottom: 20px">
-            <label for="wfh" style="margin-right: 40px">WFH</label>
-            <input
-              type="checkbox"
-              v-model="isWFH"
-              true-value="yes"
-              false-value="no"
-              id="wfh"
-            />
-          </div>
-          <div style="height: 150px">
+
+          <p v-if="absenMasuk.length > 0">
+            Absen Masuk: {{ absenMasuk[0]?.absen_masuk.split("GMT")[0] }}
+          </p>
+          <div
+            v-if="
+              (absenMasuk.length > 0 && absenMasuk[0]?.is_wfh === 'yes') ||
+              absenMasuk?.length === 0
+            "
+          >
             <div
-              v-if="isWFH === 'yes'"
               style="
                 display: flex;
-                flex-direction: column;
-                width: 100%;
-                align-items: center;
+                margin-bottom: 20px;
                 justify-content: center;
               "
             >
+              <label for="wfh" style="margin-right: 40px">WFH</label>
               <input
-                style="flex-wrap: wrap"
-                type="file"
-                accept="image/jpeg, image/png"
-                capture="camera"
-                @change="handleFileChange"
+                type="checkbox"
+                v-model="isWFH"
+                true-value="yes"
+                false-value="no"
+                id="wfh"
               />
-              <img
-                v-if="img"
-                style="width 80px; height: 80px; border: 1px solid; border-radius: 10px;"
-                :src="imgPreview"
-              />
+            </div>
+            <div style="height: 150px">
+              <div
+                v-if="isWFH === 'yes'"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  width: 100%;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <input
+                  class="form-control mb-3"
+                  style="width: fit-content"
+                  type="file"
+                  accept="image/jpeg, image/png"
+                  capture="camera"
+                  @change="handleFileChange"
+                />
+                <img
+                  v-if="img"
+                  style="width 100px; max-width: 100%; height: 80px; border: 1px solid; border-radius: 10px;"
+                  :src="imgPreview"
+                />
+              </div>
             </div>
           </div>
           <div class="d-flex w-100 justify-content-between">
@@ -138,7 +156,9 @@ import { computed, onMounted, ref, onBeforeUnmount, watch } from "vue";
 import router from "@/router";
 import { useAbsenStore } from "@/stores/absen";
 import { useUsersStore } from "@/stores/users";
+// import useFilter from "@/composable/filter";
 
+// const { formatDate } = useFilter();
 const storeAbsen = useAbsenStore();
 const storeUser = useUsersStore();
 const isWFH = ref("no");
@@ -147,6 +167,7 @@ const imgPreview = ref("");
 const img = ref(null);
 const isSuccess = ref(null);
 const errMessage = ref("");
+const message = ref("");
 
 const absenMasuk = computed(() => {
   return storeAbsen.gtrGetAbsenMasuk;
@@ -178,6 +199,7 @@ const absensiUser = async (tipeAbsen) => {
     const formData = new FormData();
     formData.append("idUser", dataUser.value.id);
     formData.append("is_wfh", isWFH.value);
+    formData.append("tipe", tipeAbsen);
     if (imgWFH.value) {
       formData.append("img_wfh", imgWFH.value);
     }
@@ -185,18 +207,28 @@ const absensiUser = async (tipeAbsen) => {
     const res = await storeAbsen.postAbsenUser(formData);
     if (res) {
       isSuccess.value = true;
-      (isWFH.value = "no"), (imgWFH.value = null), (imgPreview.value = "");
+      message.value = "Absen masuk berhasil";
+      isWFH.value = "no";
+      imgWFH.value = null;
+      imgPreview.value = "";
     } else {
+      message.value = "Absen masuk gagal";
       isSuccess.value = false;
     }
   } else {
-    await storeAbsen.actGetAbsenMasuk(dataUser.value.id);
-    console.log(absenMasuk.value.length);
     if (absenMasuk?.value?.length > 0) {
-      const res = await storeAbsen.actPatchAbsenKeluar({
+      const res = await storeAbsen.actPatchAbsen({
         idUser: dataUser.value.id,
+        idAbsen: absenMasuk?.value[0]?.id,
+        tipe: tipeAbsen,
       });
-      isSuccess.value = true;
+      if (res) {
+        isSuccess.value = true;
+        message.value = "Absen keluar berhasil";
+      } else {
+        message.value = "Absen keluar gagal";
+        isSuccess.value = false;
+      }
     } else {
       isSuccess.value = false;
       errMessage.value = "Anda belum absen masuk!";
@@ -217,6 +249,10 @@ watch(isWFH, (val) => {
 const updateTimeInterval = setInterval(updateCurrentTime, 1000);
 onBeforeUnmount(() => {
   clearInterval(updateTimeInterval);
+});
+
+onMounted(async () => {
+  await storeAbsen.actGetAbsenMasuk(dataUser.value.id);
 });
 </script>
 
